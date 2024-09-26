@@ -6,6 +6,9 @@ export class AuthService{
     account;
 
     constructor() {
+        if (!conf.appwriteUrl || !conf.appwriteProjectId) {
+            throw new Error("Missing Appwrite configuration details");
+        }
         this.client
             .setEndpoint(conf.appwriteUrl)
             .setProject(conf.appwriteProjectId)
@@ -23,13 +26,14 @@ export class AuthService{
             }
 
         } catch (error){
+            console.error("Error in createAccount:", error.message);
             throw error;
         }
     }
 
     async login({email, password}) {
         try {
-            return await this.account.createEmailSessions(email, password);
+            return await this.account.createSession(email, password);
         } catch (error) {
             throw error;
         }
@@ -46,7 +50,7 @@ export class AuthService{
 
     async logout() {
         try {
-            return await this.account.deleteSessions();
+            await this.account.deleteSessions();
         } catch (error) {
             console.log("Appwrite service :: logout :: error", error);
         }

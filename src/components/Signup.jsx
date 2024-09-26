@@ -11,19 +11,19 @@ function Signup() {
     const navigate = useNavigate()
     const [error, setError] = useState("")
     const dispatch = useDispatch()
-    const {register, handleSubmit} = useForm()
+    const {register, handleSubmit, formState: { errors }} = useForm();
 
     const create = async(data) => {
         setError("")
         try {
-            const userData = await authService.createAccount(data)
-            if(userData) {
-                const userData = await authService.getCurrentUser()
-                if(userData) dispatch(login(userData));
+            const createdUserData = await authService.createAccount(data)
+            if(createdUserData) {
+                const currentUserData = await authService.getCurrentUser()
+                if(currentUserData) dispatch(login(currentUserData));
                 navigate("/")
             }
         } catch (error) {
-            setError(error.message)
+            setError(error.message || "An error occured")
         }
     }
 
@@ -52,21 +52,25 @@ function Signup() {
                         label="Full name: "
                         placeholder="Enter your full name"
                         {...register("name",{
-                           required: true, 
+                           required: "Name is required", 
                         })}
                         />
+                        {errors.name && <p className="text-red-600">{errors.name.message}</p>}
+
                         <Input 
                         label="Email: "
                         placeholder="Enter your email"
                         type="email"
-                        {...register("email",{
-                            required: true,
-                            validate: {
-                                matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                                "Email address must be a valid address",
+                        {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                                value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                                message: "Email address must be valid"
                             }
                         })} 
                         />
+                        {errors.email && <p className="text-red-600">{errors.email.message}</p>}
+
                         <Input 
                         label="Password: "
                         type="password"
@@ -75,6 +79,8 @@ function Signup() {
                             required: true,
                         })}
                         />
+                        {errors.password && <p className="text-red-600">{errors.password.message}</p>}
+
                         <Button type="submit" className="w-full">
                             Create Account
                         </Button>
