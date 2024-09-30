@@ -14,18 +14,27 @@ function Signup() {
     const {register, handleSubmit, formState: { errors }} = useForm();
 
     const create = async(data) => {
-        setError("")
+        setError("");
         try {
-            const createdUserData = await authService.createAccount(data)
+            const createdUserData = await authService.createAccount(data);
             if(createdUserData) {
-                const currentUserData = await authService.getCurrentUser()
-                if(currentUserData) dispatch(login(currentUserData));
-                navigate("/")
+                //create session
+                const session = await authService.createSession(data.email, data.password);
+
+                //fetch the current user(only if the session was successfully created)
+                const currentUserData = await authService.getCurrentUser();
+
+                if(currentUserData) {
+                    dispatch(login(currentUserData));
+                    navigate("/");
+                } else {
+                    setError("Unable to retrive user information after login");
+                }
             }
         } catch (error) {
-            setError(error.message || "An error occured")
+            setError(error.message || "An error occurred during signup");
         }
-    }
+    };
 
     return (
         <div className="flex items-center justify-center">
