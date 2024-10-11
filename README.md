@@ -1,7 +1,7 @@
 # Blog App 🚀
 A simple full-stack blog application built with React.js, Tailwind CSS and Appwrite to handle backend functionalities like authentication and database management.
 
-## Features 🌟
+## Features ✨
 * User authentication (sign up, login, logout)
 * Create, read, update, and delete (CRUD) blog posts
 
